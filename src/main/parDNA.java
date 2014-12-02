@@ -41,8 +41,8 @@ public class parDNA {
 		c2i.put("C", 1);
 		c2i.put("G", 2);
 		c2i.put("T", 3);
-		int[][][] total = new int[Len][K][4];
-		int[][][] hold = new int[Len][K][4];
+		int[]total = new int[Len*K*4];
+		int[]hold = new int[Len*K*4];
 
 		while (sum_diff[0] > threshold) {
 			int[] diff = new int[1];
@@ -54,25 +54,44 @@ public class parDNA {
 				for(int i=0;i<Len;i++)
 					for(int j=0;j<K;j++)
 						for(int m=0;m<4;m++)
-							total[i][j][m]=0;
+							hold[i*4*K+j*4+m]=total[i*4*K+j*4+m]=0;
 				sum_diff[0]=0;
 				for (int r = 1; r < size; r++) {
 					MPI.COMM_WORLD.Send(centroids, 0, K, MPI.OBJECT, r, 0);
 				}
 				for(int r=1;r<size;r++)
 				{
-					MPI.COMM_WORLD.Recv(hold, 0, K*Len*4, MPI.INT, r, 1);
+					//System.out.println("----"+r+"\t"+hold.length+"\t"+hold[0].length+"\t"+hold[0][0].length);
+					MPI.COMM_WORLD.Recv(hold, 0, Len*K*4, MPI.INT, r, 1);
+					//System.out.println("received!");
 					for(int i=0;i<Len;i++)
 					{
-						for(int j=0;j<K;j++)
+						//System.out.print("!"+i);
+						for(int j=0;j<K;j++)	
+						{
+							
+							//System.out.print("+"+j);
 							for(int m=0;m<4;m++)
-								total[i][j][m]+=hold[i][j][m];
+							{
+								//System.out.print("("+m);
+								//System.out.print("?"+hold[0].length);
+								//System.out.print("\t"+hold[0][0].length+"?");
+								int temp=hold[i*4*K+j*4+m];
+								//System.out.print("-");
+								total[i*4*K+j*4+m]+=temp;
+								//System.out.print(m+")");
+							}
+							//System.out.print(j+"+");
+						}
+
+						//System.out.println(i+"!");
 					}
 					MPI.COMM_WORLD.Recv(diff, 0, 1, MPI.INT, r, 2);
 					sum_diff[0]+=diff[0];
 				}
+				System.out.println("?????"+sum_diff[0]);
 				for (int r = 1; r < size; r++) {
-					MPI.COMM_WORLD.Isend(sum_diff, 0, 1, MPI.INT, r, 2);
+					MPI.COMM_WORLD.Send(sum_diff, 0, 1, MPI.INT, r, 2);
 				}
 				centroids = DNAs.RecentrFromCount(data.length,K,total);
 				if(sum_diff[0]<=threshold)
@@ -85,7 +104,7 @@ public class parDNA {
 				for(int i=0;i<Len;i++)
 					for(int j=0;j<K;j++)
 						for(int m=0;m<4;m++)
-							hold[i][j][m]=0;
+							hold[i*4*K+j*4+m]=0;
 				diff[0] = 0;
 				MPI.COMM_WORLD.Recv(centroids, 0, K, MPI.OBJECT, 0, 0);
 
@@ -110,11 +129,11 @@ public class parDNA {
 					
 					for (int j = range[0]; j < range[1]; j++) {
 						int id = c2i.get("" + data.get(j).strand.charAt(i));
-						hold[i][data.get(j).centroid][id]++;
+						hold[i*4*K+data.get(j).centroid*4+id]++;
 					}
 				}
-				MPI.COMM_WORLD.Isend(hold, 0, Len*K*4, MPI.INT, 0, 1);
-				MPI.COMM_WORLD.Isend(diff, 0, 1, MPI.INT, 0, 2);
+				MPI.COMM_WORLD.Send(hold, 0, Len*K*4, MPI.INT, 0, 1);
+				MPI.COMM_WORLD.Send(diff, 0, 1, MPI.INT, 0, 2);
 				MPI.COMM_WORLD.Recv(sum_diff, 0, 1, MPI.INT, 0, 2);
 
 				if(sum_diff[0]<=threshold)

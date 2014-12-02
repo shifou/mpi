@@ -121,9 +121,8 @@ public class DNAs implements Serializable {
 
 	}
 
-	public static DNA[] RecentrFromCount(int len, int k, int[][][] total) {
+	public static DNA[] RecentrFromCount(int len, int k, int[] total) {
 		DNA[] res = new DNA[k];
-		int[][] ct = new int[k][4];
 		HashMap<String, Integer> c2i = new HashMap<String, Integer>();
 		c2i.put("A", 0);
 		c2i.put("C", 1);
@@ -141,12 +140,12 @@ public class DNAs implements Serializable {
 			for (int j = 0; j < k; j++) 
 			{
 				String cc = "A";
-				int hold = ct[j][0];
-				for (int o = 1; o < 4; o++) 
+				int hold = total[i*4*k+j*4];
+				for (int m = 1; m < 4; m++) 
 				{
-					if (total[i][j][o] > hold) {
-						hold = total[i][j][o];
-						cc = i2c.get(o);
+					if (total[i*4*k+j*4+m] > hold) {
+						hold = total[i*4*k+j*4+m];
+						cc = i2c.get(m);
 					}
 				}
 				res[j].strand.append(cc);
