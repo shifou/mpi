@@ -4,6 +4,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Random;
 import java.util.Vector;
 
@@ -154,5 +155,21 @@ public class DNAs implements Serializable {
 		}
 
 		return res;
+	}
+
+	public DNA[] getInit(int k) {
+		Random random = new Random();
+		DNA [] ans = new DNA[k];
+		int N = this.size();
+		HashSet<Integer> check =new HashSet<Integer>();
+		for (int i = 0; i < k; i++) {
+			int temp = random.nextInt(N);
+			while(check.contains(temp)!=false){
+				temp = random.nextInt(N);
+			}
+			ans[i] = this.get(temp);
+			check.add(temp);
+		}
+		return ans;
 	}
 }
