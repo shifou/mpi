@@ -27,15 +27,11 @@ public class parDNA {
 
 		char[] base = { 'A', 'C', 'G', 'T' };
 
-		Random random = new Random();
-
 		int rank = MPI.COMM_WORLD.Rank();
 		int size = MPI.COMM_WORLD.Size();
 
-		DNA[] centroids = new DNA [K];
-		for (int i = 0; i < centroids.length; i++) {
-			centroids[i] = data.get(random.nextInt(N));
-		}
+		DNA[] centroids = data.getInit(K);
+		
 		HashMap<String, Integer> c2i = new HashMap<String, Integer>();
 		c2i.put("A", 0);
 		c2i.put("C", 1);
