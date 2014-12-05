@@ -25,8 +25,12 @@
 	<target depends="init" name="build-project">
 		<echo message="${ant.project.name}: ${ant.file}"/>
 		<javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
+			<classpath>
+			        <pathelement path="libs/mpj.jar"/>
+			    </classpath>
+		
 			<src path="src"/>
-			<classpath refid="MapReduce.classpath"/>
+			<classpath refid="mpi.classpath"/>
 		</javac>
 	</target>
 	<target name="build-jar" depends="build">
