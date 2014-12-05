@@ -100,11 +100,9 @@ public class seqDNA {
 		int diff = Integer.MAX_VALUE;
 		int N = data.size();
 
-		Random random = new Random();
-		DNA[] centroids = new DNA[K];
-		for (int i = 0; i < centroids.length; i++) {
-			centroids[i] = data.get(random.nextInt(N));
-		}
+		
+		DNA[] centroids = data.getInit(K);
+		
 		while (diff > threshold) {
 			diff = 0;
 			
