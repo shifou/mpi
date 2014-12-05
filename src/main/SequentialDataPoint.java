@@ -82,7 +82,6 @@ public class SequentialDataPoint {
 		List<List<DataPoint>> clusters = new ArrayList<List<DataPoint>>();
 		for (int i = 0; i < numClusters; i++){
 			List<DataPoint> cluster =  new ArrayList<DataPoint>();
-			cluster.add(centroids[i]);
 			clusters.add(cluster);
 		}
 		int iterations = 0;
@@ -118,7 +117,7 @@ public class SequentialDataPoint {
 		int check_count = 0;
 		for (int i = 0; i < K; i++){
 			Double distance = DataPoint.getDistance(old_centroids[i], new_centroids[i]);
-			if (distance < threshold){
+			if (distance <= threshold){
 				check_count += 1;
 			}
 		}
