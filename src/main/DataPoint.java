@@ -1,6 +1,7 @@
 package main;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class DataPoint implements Serializable {
 
@@ -34,10 +35,15 @@ public class DataPoint implements Serializable {
 		return this.x.toString()+","+this.y.toString();
 	}
 	
-	public static DataPoint getMean(DataPoint a, DataPoint b){
-		Double x1 = (a.getX() + b.getX())/2;
-		Double y1 = (a.getY() + b.getY())/2;
-		return new DataPoint(x1, y1);
+	public static DataPoint getMeanOfCluster(List<DataPoint> cluster){
+		int num_points = cluster.size();
+		Double x_val = 0d;
+		Double y_val = 0d;
+		for (DataPoint p : cluster){
+			x_val += p.getX();
+			y_val += p.getY();
+		}
+		return new DataPoint(x_val/num_points, y_val/num_points);
 	}
 	
 	public static int getClosestPoint(DataPoint p, DataPoint[] centroids){

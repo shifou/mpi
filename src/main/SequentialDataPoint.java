@@ -79,12 +79,23 @@ public class SequentialDataPoint {
 	private static DataPoint[] sequentialDataPointKMeans(int numClusters, List<DataPoint> data){
 		
 		DataPoint[] centroids = selectKRandomCentroids(numClusters, data);
+		List<List<DataPoint>> clusters = new ArrayList<List<DataPoint>>();
+		for (int i = 0; i < numClusters; i++){
+			List<DataPoint> cluster =  new ArrayList<DataPoint>();
+			cluster.add(centroids[i]);
+			clusters.add(cluster);
+		}
 		int iterations = 0;
 		while (true){
-			DataPoint[] new_centroids = Arrays.copyOf(centroids, centroids.length);
+			DataPoint[] new_centroids = new DataPoint[numClusters];
 			for (DataPoint p: data){
 				int closest = DataPoint.getClosestPoint(p, centroids);
-				new_centroids[closest] = DataPoint.getMean(p, new_centroids[closest]);
+				clusters.get(closest).add(p);
+			}
+			int index = 0;
+			for (List<DataPoint> cluster : clusters){
+				new_centroids[index] = DataPoint.getMeanOfCluster(cluster);
+				index += 1;
 			}
 			if (checkCentroidVariations(centroids, new_centroids, numClusters)){
 				System.out.println("Number of Iterations = " + (iterations + 1));
