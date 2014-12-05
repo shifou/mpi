@@ -106,12 +106,15 @@ public class DNAs implements Serializable {
 			TACG[1] = 'A';
 			TACG[2] = 'C';
 			TACG[3] = 'G';
+			System.out.println("-----"+num);
 			for (int i = 0; i < num; i++) {
+				//System.out.println("-----"+i);
 				String hold = "";
 				for (int j = 0; j < len; j++) {
 					hold += TACG[rand.nextInt(4)];
 				}
 				wr.write(hold + "\n");
+				wr.flush();
 			}
 			return true;
 		} catch (IOException e) {
