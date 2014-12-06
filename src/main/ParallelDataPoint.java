@@ -119,12 +119,15 @@ public class ParallelDataPoint {
 		
 		while(true){
 			
-			if (myRank == 0){
+			if (myRank == 0){ //in the master
+				/*send each slave the centroids */
 				for (int i = 1; i < slaveSize; i++){
 					MPI.COMM_WORLD.Send(centroids, 0, numClusters, MPI.OBJECT, i, 0);
 				}
 				DataPoint[][] temp_centroids = new DataPoint[slaveSize-1][numClusters];
 				int[][] points_added = new int[slaveSize - 1][numClusters];
+				/*receive from each slave their intermediate centroids and the number of 
+				 * data points added to each cluster*/
 				for (int i = 1; i < slaveSize; i++){
 					DataPoint[] temp_c = new DataPoint[numClusters];
 					int[] temp_num = new int[numClusters];
@@ -134,6 +137,7 @@ public class ParallelDataPoint {
 					points_added[i-1] = Arrays.copyOf(temp_num, numClusters);
 				}
 				DataPoint[] new_centroids = new DataPoint[numClusters];
+				/*recalculate the centroids */
 				for (int j = 0; j < numClusters; j++){
 					Double x = 0d;
 					int x_num = 0;
@@ -147,6 +151,8 @@ public class ParallelDataPoint {
 					}
 					new_centroids[j] = new DataPoint(x/x_num, y/y_num);
 				}
+				/*if the new centroids are within a threshold of the old ones, we're done.
+				 * So tell each slave to terminate. Return the centroids calculated. */
 				if (checkCentroidVariations(centroids, new_centroids, numClusters)){
 					System.out.println("Number of Iterations = " + (iterations + 1));
 					boolean[] run = new boolean[1];
@@ -156,6 +162,7 @@ public class ParallelDataPoint {
 					}
 					return new_centroids;
 				}
+				/*Otherwise go on to the next iteration by telling each slave to continue! */
 				boolean[] run = new boolean[1];
 				run[0] = true;
 				for (int i = 1; i < slaveSize; i++){
@@ -166,13 +173,16 @@ public class ParallelDataPoint {
 				
 				
 			}
-			else {
+			else { //in a slave
 				MPI.COMM_WORLD.Recv(centroids, 0, numClusters, MPI.OBJECT, 0, 0);
+				/*get the partiton of the data set to work on*/
 				int[] range = getRange(dataSize, slaveSize - 1, myRank);
 				List<List<DataPoint>> clusters = new ArrayList<List<DataPoint>>();
 				for (int i = 0; i < numClusters; i++){
 					clusters.add(new ArrayList<DataPoint>());
 				}
+				/*for each point in the partiton, find the closest centroid, 
+				 * add the point to that cluster*/
 				for (int i = range[0]; i < range[1]; i++){
 					int closest = DataPoint.getClosestPoint(data.get(i), centroids);
 					clusters.get(closest).add(data.get(i));
@@ -180,6 +190,8 @@ public class ParallelDataPoint {
 				DataPoint[] new_centroids = new DataPoint[numClusters];
 				int[] num_added = new int[numClusters];
 				int index = 0;
+				/*for each cluster, recalculate its centroid and keep track of the number of 
+				 * points added to the cluster in this iteration */
 				for (List<DataPoint> cluster : clusters){
 					if (cluster.size() != 0){
 						new_centroids[index] = DataPoint.getMeanOfCluster(cluster);
@@ -190,9 +202,12 @@ public class ParallelDataPoint {
 					num_added[index] = cluster.size();
 					index += 1;
 				}
+				/*send the master the newly calculated centroids and number of points added
+				 * to each cluster */
 				MPI.COMM_WORLD.Send(new_centroids, 0, numClusters, MPI.OBJECT, 0, 0);
 				MPI.COMM_WORLD.Send(num_added, 0, numClusters, MPI.INT, 0, 1);
 				boolean[] run = new boolean[1];
+				/*wait for instructions from the master on whether to continue or terminate */
 				MPI.COMM_WORLD.Recv(run, 0, 1, MPI.BOOLEAN, 0, 2);
 				if (!run[0]){
 					System.out.println("Slave " + myRank +" done!");
@@ -203,6 +218,8 @@ public class ParallelDataPoint {
 		}
 	}
 	
+	/*determines the partition of the data set with which a slave with slaveRank
+	 * needs to work */
 	private static int[] getRange(int numPoints, int numSlaves, int slaveRank) {
 		int between = (int) Math.ceil((double) numPoints / (double) numSlaves);
 		if (slaveRank != numSlaves) {
@@ -214,12 +231,15 @@ public class ParallelDataPoint {
 		}
 	}
 	
+	/*given a list of data points, randomly selects K of them */
 	private static DataPoint[] selectKRandomCentroids(int K, List<DataPoint> data){
 		List<DataPoint> shuffled = new ArrayList<DataPoint>(data);
 		Collections.shuffle(shuffled);
 		return shuffled.subList(0, K).toArray(new DataPoint[K]);
 	}
 	
+	/*checks whether the respective pairs of centroids in old and new are within 
+	 * a threshold distance of each other */
 	private static boolean checkCentroidVariations(DataPoint[] old_centroids, DataPoint[] new_centroids, int K){
 		
 		int check_count = 0;
@@ -233,6 +253,7 @@ public class ParallelDataPoint {
 		
 	}
 	
+	/*writes the output of the program to the output file provided */
 	private static void writeOutput(DataPoint[] centroids, String outputFilename){
 		File outputFile = new File(outputFilename);
 		PrintWriter out = null;

@@ -83,36 +83,46 @@ public class SequentialDataPoint {
 		int iterations = 0;
 		while (true){
 			clusters = new ArrayList<List<DataPoint>>();
+			/*create the clusters*/
 			for (int i = 0; i < numClusters; i++){
 				List<DataPoint> cluster =  new ArrayList<DataPoint>();
 				clusters.add(cluster);
 			}
 			DataPoint[] new_centroids = new DataPoint[numClusters];
+			/*for each point in the data set, find the closest centroid, 
+			 * add the point to that cluster*/
 			for (DataPoint p: data){
 				int closest = DataPoint.getClosestPoint(p, centroids);
 				clusters.get(closest).add(p);
 			}
 			int index = 0;
+			/*for each cluster, recalculate its centroid  */
 			for (List<DataPoint> cluster : clusters){
 				new_centroids[index] = DataPoint.getMeanOfCluster(cluster);
 				index += 1;
 			}
+			/*if the new centroids are within a threshold of the old ones, we're done.
+			 *Return the centroids calculated. */
 			if (checkCentroidVariations(centroids, new_centroids, numClusters)){
 				System.out.println("Number of Iterations = " + (iterations + 1));
 				return new_centroids;
 			}
+			/*Otherwise go on to the next iteration */
 			centroids = Arrays.copyOf(new_centroids, new_centroids.length);
 			iterations += 1;
 		}
 		
 	}
 	
+	/*given a list of data points, randomly selects K of them */
 	private static DataPoint[] selectKRandomCentroids(int K, List<DataPoint> data){
 		List<DataPoint> shuffled = new ArrayList<DataPoint>(data);
 		Collections.shuffle(shuffled);
 		return shuffled.subList(0, K).toArray(new DataPoint[K]);
 	}
 	
+	/*checks whether the respective pairs of centroids in old and new are within 
+	 * a threshold distance of each other */
 	private static boolean checkCentroidVariations(DataPoint[] old_centroids, DataPoint[] new_centroids, int K){
 		
 		int check_count = 0;
@@ -126,6 +136,7 @@ public class SequentialDataPoint {
 		
 	}
 	
+	/*writes the output of the program to the output file provided */
 	private static void writeOutput(DataPoint[] centroids, String outputFilename){
 		File outputFile = new File(outputFilename);
 		PrintWriter out = null;
