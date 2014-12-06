@@ -53,7 +53,7 @@ public class parDNA {
 							hold[i*4*K+j*4+m]=total[i*4*K+j*4+m]=0;
 				sum_diff[0]=0;
 				for (int r = 1; r < size; r++) {
-					MPI.COMM_WORLD.Send(centroids, 0, K, MPI.OBJECT, r, 0);
+					MPI.COMM_WORLD.Isend(centroids, 0, K, MPI.OBJECT, r, 0);
 				}
 				for(int r=1;r<size;r++)
 				{
