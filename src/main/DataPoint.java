@@ -32,7 +32,7 @@ public class DataPoint implements Serializable {
 	}
 	
 	public String toString(){
-		return this.x.toString()+","+this.y.toString();
+		return this.x+","+this.y;
 	}
 	
 	public static DataPoint getMeanOfCluster(List<DataPoint> cluster){

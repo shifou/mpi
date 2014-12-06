@@ -110,7 +110,11 @@ public class ParallelDataPoint {
 		int dataSize = data.size();
 		
 		DataPoint[] centroids = selectKRandomCentroids(numClusters, data);
-		
+/*		int l = 0;
+		for (int i = 5; i < 5 + numClusters; i++){
+			centroids[l] = data.get(i);
+			l++;
+		}*/
 		int iterations = 0;
 		
 		while(true){
@@ -122,8 +126,12 @@ public class ParallelDataPoint {
 				DataPoint[][] temp_centroids = new DataPoint[slaveSize-1][numClusters];
 				int[][] points_added = new int[slaveSize - 1][numClusters];
 				for (int i = 1; i < slaveSize; i++){
-					MPI.COMM_WORLD.Recv(temp_centroids[i-1], 0, numClusters, MPI.OBJECT, i, 0);
-					MPI.COMM_WORLD.Recv(points_added[i-1], 0, numClusters, MPI.INT, i, 1);
+					DataPoint[] temp_c = new DataPoint[numClusters];
+					int[] temp_num = new int[numClusters];
+					MPI.COMM_WORLD.Recv(temp_c, 0, numClusters, MPI.OBJECT, i, 0);
+					temp_centroids[i-1] = Arrays.copyOf(temp_c, numClusters);
+					MPI.COMM_WORLD.Recv(temp_num, 0, numClusters, MPI.INT, i, 1);
+					points_added[i-1] = Arrays.copyOf(temp_num, numClusters);
 				}
 				DataPoint[] new_centroids = new DataPoint[numClusters];
 				for (int j = 0; j < numClusters; j++){
@@ -173,7 +181,12 @@ public class ParallelDataPoint {
 				int[] num_added = new int[numClusters];
 				int index = 0;
 				for (List<DataPoint> cluster : clusters){
-					new_centroids[index] = DataPoint.getMeanOfCluster(cluster);
+					if (cluster.size() != 0){
+						new_centroids[index] = DataPoint.getMeanOfCluster(cluster);
+					}
+					else {
+						new_centroids[index] = new DataPoint(0.0, 0.0);
+					}
 					num_added[index] = cluster.size();
 					index += 1;
 				}

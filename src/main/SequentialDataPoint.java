@@ -79,13 +79,14 @@ public class SequentialDataPoint {
 	private static DataPoint[] sequentialDataPointKMeans(int numClusters, List<DataPoint> data){
 		
 		DataPoint[] centroids = selectKRandomCentroids(numClusters, data);
-		List<List<DataPoint>> clusters = new ArrayList<List<DataPoint>>();
-		for (int i = 0; i < numClusters; i++){
-			List<DataPoint> cluster =  new ArrayList<DataPoint>();
-			clusters.add(cluster);
-		}
+		List<List<DataPoint>> clusters;
 		int iterations = 0;
 		while (true){
+			clusters = new ArrayList<List<DataPoint>>();
+			for (int i = 0; i < numClusters; i++){
+				List<DataPoint> cluster =  new ArrayList<DataPoint>();
+				clusters.add(cluster);
+			}
 			DataPoint[] new_centroids = new DataPoint[numClusters];
 			for (DataPoint p: data){
 				int closest = DataPoint.getClosestPoint(p, centroids);
