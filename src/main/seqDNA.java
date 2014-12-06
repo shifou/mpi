@@ -9,9 +9,11 @@ import java.io.PrintWriter;
 import java.util.Random;
 
 public class seqDNA {
-	
+	// store final centrid
 	DNA []ans;
+	// number of cluster we want to get
 	int K;
+	// stop threshold
 	private static int threshold = 5;
 	public seqDNA(int k) {
 		K=k;
@@ -39,6 +41,7 @@ public class seqDNA {
 			String inputFile = args[2];
 			String outputFile = args[3];
 			DNAs data = new DNAs(len);
+			// read the data
 			try {
 				BufferedReader in = new BufferedReader(new FileReader(inputFile));
 				String line;
@@ -73,7 +76,7 @@ public class seqDNA {
 
 		} 
 	}
-
+	// writing to the output file
 	private void writeOutput(String outFilename) {
 		// TODO Auto-generated method stub
 		File outFile = new File(outFilename);
@@ -94,7 +97,7 @@ public class seqDNA {
 
 		}
 	}
-
+	
 	private void cluster(DNAs data) {
 		// TODO Auto-generated method stub
 		int diff = Integer.MAX_VALUE;
@@ -102,10 +105,10 @@ public class seqDNA {
 
 		
 		DNA[] centroids = data.getInit(K);
-		
+		// greater than the thershold go to another iteration
 		while (diff > threshold) {
 			diff = 0;
-			
+			// lable each DNA the closest centroid
 			for (int i = 0; i < N; i++) {
 				int minDis = Integer.MAX_VALUE;
 				int pos = 0;
@@ -123,7 +126,7 @@ public class seqDNA {
 				}
 			}
 
-			// recalculate
+			// get the new centroid 
 			centroids = DNAs.Recentroid(data.length,K,data);
 			
 		}

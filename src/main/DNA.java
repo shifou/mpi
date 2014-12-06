@@ -5,7 +5,9 @@ import java.io.Serializable;
 public class DNA implements Serializable{
 
 	private static final long serialVersionUID = 2296111981212487438L;
+	// dna string
 	public StringBuffer strand;
+	// current cluster label
 	public int centroid;
 	public DNA(StringBuffer s)
 	{

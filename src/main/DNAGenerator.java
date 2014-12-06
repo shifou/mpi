@@ -19,6 +19,7 @@ public class DNAGenerator {
 			return;
 		}
 			String outputFile = args[2];	
+			// call static method in DNAs
 			if(DNAs.generate(len,num,outputFile))
 				System.out.println("done!");
 			else

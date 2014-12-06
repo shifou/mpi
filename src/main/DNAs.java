@@ -11,7 +11,9 @@ import java.util.Vector;
 public class DNAs implements Serializable {
 
 	private static final long serialVersionUID = -3237008642462674263L;
+	// total dna
 	public Vector<DNA> dnas;
+	// each DNA length
 	public int length;
 
 	public DNAs(int ll) {
@@ -29,7 +31,7 @@ public class DNAs implements Serializable {
 	public void add(DNA a) {
 		dnas.add(a);
 	}
-
+	// return the distance here the distance is the difference in each position
 	public static int getDis(DNA a, DNA b) {
 		int dis = 0;
 		if (a == null) {
@@ -47,7 +49,7 @@ public class DNAs implements Serializable {
 		}
 		return dis;
 	}
-
+	// how many dna
 	public int size() {
 
 		return dnas.size();
@@ -57,7 +59,8 @@ public class DNAs implements Serializable {
 
 		return dnas.get(nextInt);
 	}
-
+	// calculate the new centroid based on the most common base for each position in the 
+	// strand among all the strands
 	public static DNA[] Recentroid(int len, int k, DNAs data) {
 		DNA[] res = new DNA[k];
 		int[][] ct = new int[k][4];
@@ -96,7 +99,7 @@ public class DNAs implements Serializable {
 		}
 		return res;
 	}
-
+	// generate the DNAs given the DNA lengh and the total DNA numbers
 	public static boolean generate(int len, int num, String fileName) {
 		try {
 			FileWriter wr = new FileWriter(fileName);
@@ -124,7 +127,8 @@ public class DNAs implements Serializable {
 		}
 
 	}
-
+	// calculate the new centroid based on the most common base for each position in the 
+	// strand among all the strands, different from the above Recentr Here we generate from the count
 	public static DNA[] RecentrFromCount(int len, int k, int[] total) {
 		DNA[] res = new DNA[k];
 		HashMap<String, Integer> c2i = new HashMap<String, Integer>();
@@ -159,7 +163,7 @@ public class DNAs implements Serializable {
 
 		return res;
 	}
-
+	// select the initial centroid from random
 	public DNA[] getInit(int k) {
 		Random random = new Random();
 		DNA [] ans = new DNA[k];
